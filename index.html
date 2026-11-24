@@ -214,6 +214,59 @@ table.hist td:first-child{color:var(--muted)}
 .focus-mode .card:not(.focus-active){display:none}
 .focus-mode #tabs{display:none}
 .focus-mode .app{max-width:640px}
+
+/* SVG MANNEQUIN ANIMATIONS */
+.mannequin { display: block; overflow: visible; }
+.mannequin path, .mannequin circle, .mannequin rect { 
+  fill: url(#goldGrad); 
+  stroke: #c9932b; 
+  stroke-width: 1.5;
+  filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.5));
+}
+.mannequin .bg { fill: none; stroke: #333; stroke-width: 1; stroke-dasharray: 2; filter: none; }
+.mannequin .bar { fill: #555; stroke: none; filter: none; }
+
+/* Push-Up Motion */
+.anim-push .body { animation: pushBody 1.8s infinite ease-in-out alternate; transform-origin: 75px 80px; }
+.anim-push .arm-upper { animation: pushArmU 1.8s infinite ease-in-out alternate; transform-origin: 70px 55px; }
+.anim-push .arm-lower { animation: pushArmL 1.8s infinite ease-in-out alternate; transform-origin: 75px 70px; }
+@keyframes pushBody { 0%, 20% { transform: translateY(0); } 80%, 100% { transform: translateY(14px); } }
+@keyframes pushArmU { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(25deg); } }
+@keyframes pushArmL { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-35deg); } }
+
+/* Squat Motion */
+.anim-squat .body { animation: squatBody 1.8s infinite ease-in-out alternate; transform-origin: 50px 65px; }
+.anim-squat .leg-upper { animation: squatLegU 1.8s infinite ease-in-out alternate; transform-origin: 50px 65px; }
+.anim-squat .leg-lower { animation: squatLegL 1.8s infinite ease-in-out alternate; transform-origin: 60px 80px; }
+@keyframes squatBody { 0%, 20% { transform: translateY(0) rotate(0deg); } 80%, 100% { transform: translateY(18px) rotate(15deg); } }
+@keyframes squatLegU { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(30deg); } }
+@keyframes squatLegL { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-45deg); } }
+
+/* Pull-Up Motion */
+.anim-pullup .body { animation: pullBody 1.8s infinite ease-in-out alternate; transform-origin: 50px 30px; }
+.anim-pullup .arm-upper { animation: pullArm 1.8s infinite ease-in-out alternate; transform-origin: 50px 30px; }
+@keyframes pullBody { 0%, 20% { transform: translateY(0); } 80%, 100% { transform: translateY(-20px); } }
+@keyframes pullArm { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(15deg); } }
+
+/* Row Motion */
+.anim-row .body { animation: rowBody 1.8s infinite ease-in-out alternate; transform-origin: 30px 60px; }
+.anim-row .arm-upper { animation: rowArm 1.8s infinite ease-in-out alternate; transform-origin: 70px 50px; }
+@keyframes rowBody { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-15deg); } }
+@keyframes rowArm { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-40deg); } }
+
+/* Bridge Motion */
+.anim-bridge .body { animation: bridgeBody 1.8s infinite ease-in-out alternate; transform-origin: 30px 80px; }
+@keyframes bridgeBody { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-20deg); } }
+
+/* Lunge Motion */
+.anim-lunge .body { animation: lungeBody 1.8s infinite ease-in-out alternate; transform-origin: 45px 55px; }
+.anim-lunge .leg-back { animation: lungeLeg 1.8s infinite ease-in-out alternate; transform-origin: 45px 55px; }
+@keyframes lungeBody { 0%, 20% { transform: translateY(0); } 80%, 100% { transform: translateY(15px); } }
+@keyframes lungeLeg { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-20deg); } }
+
+/* Static / Plank */
+.anim-static .body { animation: breathe 3s infinite ease-in-out; }
+@keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
 </style>
 </head>
 <body>
@@ -230,7 +283,7 @@ table.hist td:first-child{color:var(--muted)}
 <script>
 /* ==========================================================================
    FORGE — The Athletic Level-Up System
-   Accurate, exercise-specific animated SVG flashcards + interactive variations.
+   Includes accurate 3D-style SVG mannequins for precise exercise demos.
    ========================================================================== */
 
 (function(){
@@ -808,158 +861,162 @@ function checkAchievements(){
   return unlocked;
 }
 
-/* -------------------- ACCURATE VISUALS (FLASHCARDS) -------------------- */
+/* -------------------- HIGH-FIDELITY SVG MANNEQUINS -------------------- */
 function getExerciseVisual(exId, large) {
-  const h = large ? 140 : 44;
+  const h = large ? 160 : 44;
   const w = large ? '100%' : '44px';
-  const scale = large ? 1 : 0.44;
-  const offset = large ? 0 : 28; 
+  const scale = large ? 1.2 : 0.44;
+  const offset = large ? -10 : 28; 
 
-  const gold = '#e9b949';
-  const grey = '#555';
-
-  // Shared CSS for animations
-  const css = `
-    <style>
-      .b { animation: bob 1.4s infinite ease-in-out alternate; transform-origin: bottom center; }
-      @keyframes bob { 0% { transform: translateY(0) scaleY(1); } 100% { transform: translateY(${large?'15px':'6px'}) scaleY(0.85); } }
-      .s { animation: stretch 1.4s infinite ease-in-out alternate; transform-origin: bottom center; }
-      @keyframes stretch { 0% { transform: translateY(0); } 100% { transform: translateY(${large?'-10px':'-4px'}); } }
-      .p { animation: pull 1.5s infinite ease-in-out alternate; transform-origin: top center; }
-      @keyframes pull { 0% { transform: translateY(0); } 100% { transform: translateY(${large?'15px':'6px'}); } }
-      .r { animation: rot 1.5s infinite ease-in-out alternate; transform-origin: bottom left; }
-      @keyframes rot { 0% { transform: rotate(0deg); } 100% { transform: rotate(-25deg); } }
-      .stat { animation: static 2s infinite ease-in-out; }
-      @keyframes static { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(1px); } }
-    </style>
+  // Determine which movement pattern to use
+  let moveClass = 'anim-static';
+  if (['push-up','wide-push-up','knee-push-up','diamond-push-up','incline-push-up','decline-push-up','archer-push-up','pseudo-planche-push-up','one-arm-push-up-negative','pike-push-up','incline-pike-push-up','db-floor-press','bb-bench-press','db-fly'].includes(exId)) moveClass = 'anim-push';
+  else if (['bodyweight-squat','band-squat','goblet-squat','bb-back-squat','chair-squat','wall-sit','deep-squat-hold'].includes(exId)) moveClass = 'anim-squat';
+  else if (['reverse-lunge','split-squat','bulgarian-split-squat','db-reverse-lunge','step-up'].includes(exId)) moveClass = 'anim-lunge';
+  else if (['pull-up','negative-pull-up','lat-pulldown','band-lat-pulldown'].includes(exId)) moveClass = 'anim-pullup';
+  else if (['inverted-row','db-row','cable-row','band-row','towel-iso-row','doorway-row'].includes(exId)) moveClass = 'anim-row';
+  else if (['glute-bridge','single-leg-glute-bridge','band-glute-bridge','bb-hip-thrust'].includes(exId)) moveClass = 'anim-bridge';
+  else if (['burpee','squat-jump','jumping-jack','high-knees','mountain-climber','bear-crawl'].includes(exId)) moveClass = 'anim-burpee';
+  
+  // 3D shading gradients
+  const defs = `
+    <defs>
+      <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f7d777"/>
+        <stop offset="100%" stop-color="#c9932b"/>
+      </linearGradient>
+      <linearGradient id="darkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#444"/>
+        <stop offset="100%" stop-color="#111"/>
+      </linearGradient>
+    </defs>
   `;
 
+  // Base Mannequin Geometry
+  const mannequin = `
+    <g class="body">
+      <!-- Head -->
+      <circle cx="50" cy="25" r="8" />
+      <!-- Torso -->
+      <rect x="42" y="35" width="16" height="30" rx="8" />
+      
+      <!-- Left Arm (Background) -->
+      <path d="M 42 42 L 30 60 L 30 75" fill="none" stroke="#b07d1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" style="filter:none"/>
+      
+      <!-- Left Leg (Background) -->
+      <path d="M 42 65 L 30 85 L 30 95" fill="none" stroke="#b07d1a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" style="filter:none"/>
+    </g>
+
+    <!-- Right Leg (Foreground) -->
+    <g class="leg-fore">
+      <path d="M 58 65 L 70 85 L 70 95" fill="none" stroke="url(#goldGrad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Right Arm (Foreground) -->
+    <g class="arm-fore">
+      <path d="M 58 42 L 70 60 L 70 75" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  `;
+
+  // Override geometry for specific poses
   let content = '';
-
-  // Map specific exercises to accurate movement patterns
-  if (['push-up','wide-push-up','knee-push-up','diamond-push-up','incline-push-up','decline-push-up','archer-push-up','pseudo-planche-push-up','one-arm-push-up-negative','pike-push-up','incline-pike-push-up','db-floor-press','bb-bench-press','db-fly'].includes(exId)) {
-    // PUSH-UP PATTERN (Horizontal press)
+  if (moveClass === 'anim-push') {
     content = `
-      <line x1="15" y1="80" x2="85" y2="80" stroke="${grey}" stroke-width="2" stroke-dasharray="4"/>
-      <g class="b">
-        <line x1="20" y1="35" x2="75" y2="65" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="85" cy="70" r="6" fill="${gold}"/>
-        <line x1="75" y1="65" x2="80" y2="80" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="20" y1="35" x2="15" y2="80" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="10" y1="90" x2="90" y2="90" class="bg"/>
+      <g class="body">
+        <circle cx="80" cy="65" r="7" />
+        <rect x="25" y="55" width="45" height="14" rx="7" />
+        <path d="M 30 65 L 20 85 L 15 90" fill="none" stroke="#b07d1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" style="filter:none"/>
+      </g>
+      <g class="arm-upper">
+        <path d="M 70 60 L 75 75" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round"/>
+      </g>
+      <g class="arm-lower">
+        <path d="M 75 75 L 80 90" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round"/>
       </g>
     `;
-  } else if (['bodyweight-squat','band-squat','goblet-squat','bb-back-squat','chair-squat','wall-sit','deep-squat-hold'].includes(exId)) {
-    // SQUAT PATTERN (Vertical drop)
+  } else if (moveClass === 'anim-squat') {
     content = `
-      <line x1="15" y1="85" x2="85" y2="85" stroke="${grey}" stroke-width="2" stroke-dasharray="4"/>
-      <g class="b">
-        <line x1="50" y1="25" x2="50" y2="55" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="50" cy="18" r="6" fill="${gold}"/>
-        <line x1="50" y1="55" x2="65" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="55" x2="35" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="35" x2="65" y2="45" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="35" x2="35" y2="45" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="10" y1="95" x2="90" y2="95" class="bg"/>
+      <g class="body">
+        <circle cx="50" cy="20" r="7" />
+        <rect x="43" y="30" width="14" height="30" rx="7" />
+        <path d="M 45 40 L 35 60" fill="none" stroke="#b07d1a" stroke-width="8" stroke-linecap="round" style="filter:none"/>
+      </g>
+      <g class="leg-fore">
+        <g class="leg-upper">
+          <path d="M 55 60 L 65 75" fill="none" stroke="url(#goldGrad)" stroke-width="10" stroke-linecap="round"/>
+        </g>
+        <g class="leg-lower">
+          <path d="M 65 75 L 65 95" fill="none" stroke="url(#goldGrad)" stroke-width="10" stroke-linecap="round"/>
+        </g>
+      </g>
+      <g class="arm-fore">
+        <path d="M 55 40 L 65 60" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round"/>
       </g>
     `;
-  } else if (['reverse-lunge','split-squat','bulgarian-split-squat','db-reverse-lunge','step-up'].includes(exId)) {
-    // LUNGE PATTERN (One leg back)
+  } else if (moveClass === 'anim-pullup') {
     content = `
-      <line x1="15" y1="85" x2="85" y2="85" stroke="${grey}" stroke-width="2" stroke-dasharray="4"/>
-      <g class="b">
-        <line x1="45" y1="25" x2="45" y2="55" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="45" cy="18" r="6" fill="${gold}"/>
-        <line x1="45" y1="55" x2="65" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="45" y1="55" x2="25" y2="75" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="25" y1="75" x2="25" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="20" y1="10" x2="80" y2="10" class="bar"/>
+      <g class="body">
+        <circle cx="50" cy="30" r="7" />
+        <rect x="43" y="40" width="14" height="30" rx="7" />
+        <path d="M 45 50 L 55 75 L 55 90" fill="none" stroke="#b07d1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" style="filter:none"/>
+      </g>
+      <g class="arm-upper">
+        <path d="M 45 40 L 40 20 L 40 10" fill="none" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 55 40 L 60 20 L 60 10" fill="none" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
     `;
-  } else if (['plank','rkc-plank','side-plank','dead-bug','bird-dog'].includes(exId)) {
-    // PLANK / STATIC CORE (Horizontal static)
+  } else if (moveClass === 'anim-row') {
     content = `
-      <line x1="15" y1="80" x2="85" y2="80" stroke="${grey}" stroke-width="2" stroke-dasharray="4"/>
-      <g class="stat">
-        <line x1="20" y1="40" x2="75" y2="65" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="85" cy="70" r="6" fill="${gold}"/>
-        <line x1="75" y1="65" x2="80" y2="80" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="20" y1="40" x2="15" y2="80" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="10" y1="95" x2="90" y2="95" class="bg"/>
+      <g class="body">
+        <circle cx="20" cy="50" r="7" />
+        <rect x="25" y="50" width="40" height="14" rx="7" transform="rotate(15 45 57)"/>
+        <path d="M 30 60 L 25 80 L 20 95" fill="none" stroke="#b07d1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" style="filter:none"/>
+      </g>
+      <g class="arm-upper">
+        <path d="M 60 58 L 60 75 L 60 95" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
     `;
-  } else if (['glute-bridge','single-leg-glute-bridge','band-glute-bridge','bb-hip-thrust'].includes(exId)) {
-    // BRIDGE PATTERN (Hips rise)
+  } else if (moveClass === 'anim-bridge') {
     content = `
-      <line x1="15" y1="80" x2="85" y2="80" stroke="${grey}" stroke-width="2" stroke-dasharray="4"/>
-      <g class="b">
-        <line x1="20" y1="80" x2="50" y2="50" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="15" cy="80" r="6" fill="${gold}"/>
-        <line x1="50" y1="50" x2="75" y2="80" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="10" y1="95" x2="90" y2="95" class="bg"/>
+      <g class="body">
+        <circle cx="20" cy="85" r="7" />
+        <rect x="25" y="70" width="40" height="14" rx="7" />
+        <path d="M 65 75 L 75 85 L 75 95" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
     `;
-  } else if (['pull-up','negative-pull-up','lat-pulldown','band-lat-pulldown'].includes(exId)) {
-    // PULL-UP / PULLDOWN (Vertical pull)
+  } else if (moveClass === 'anim-lunge') {
     content = `
-      <line x1="20" y1="15" x2="80" y2="15" stroke="${grey}" stroke-width="4" stroke-linecap="round"/>
-      <g class="p">
-        <line x1="50" y1="30" x2="50" y2="65" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="50" cy="23" r="6" fill="${gold}"/>
-        <line x1="50" y1="30" x2="40" y2="15" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="30" x2="60" y2="15" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="10" y1="95" x2="90" y2="95" class="bg"/>
+      <g class="body">
+        <circle cx="45" cy="20" r="7" />
+        <rect x="38" y="30" width="14" height="30" rx="7" />
+        <path d="M 40 40 L 30 55" fill="none" stroke="#b07d1a" stroke-width="8" stroke-linecap="round" style="filter:none"/>
       </g>
-    `;
-  } else if (['inverted-row','db-row','cable-row','band-row','towel-iso-row','doorway-row'].includes(exId)) {
-    // ROW PATTERN (Horizontal pull)
-    content = `
-      <line x1="15" y1="80" x2="85" y2="80" stroke="${grey}" stroke-width="2" stroke-dasharray="4"/>
-      <g class="r">
-        <line x1="20" y1="45" x2="60" y2="55" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="15" cy="40" r="6" fill="${gold}"/>
-        <line x1="60" y1="55" x2="70" y2="80" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="30" y1="48" x2="20" y2="40" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      <g class="leg-back">
+        <path d="M 45 60 L 25 75 L 25 95" fill="none" stroke="#b07d1a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" style="filter:none"/>
       </g>
-    `;
-  } else if (['burpee','squat-jump','jumping-jack','high-knees','mountain-climber','bear-crawl'].includes(exId)) {
-    // DYNAMIC / CONDITIONING (Jumping/Explosive)
-    content = `
-      <line x1="15" y1="85" x2="85" y2="85" stroke="${grey}" stroke-width="2" stroke-dasharray="4"/>
-      <g class="s">
-        <line x1="50" y1="30" x2="50" y2="60" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="50" cy="23" r="6" fill="${gold}"/>
-        <line x1="50" y1="60" x2="65" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="60" x2="35" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="30" x2="65" y2="10" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="30" x2="35" y2="10" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      <g class="leg-fore">
+        <path d="M 50 60 L 65 80 L 65 95" fill="none" stroke="url(#goldGrad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
-    `;
-  } else if (['calf-raise','single-leg-calf-raise','db-calf-raise','ankle-rock','leg-raise','hanging-knee-raise'].includes(exId)) {
-    // CALVES / LEGS (Small stretch)
-    content = `
-      <line x1="15" y1="85" x2="85" y2="85" stroke="${grey}" stroke-width="2" stroke-dasharray="4"/>
-      <g class="s">
-        <line x1="50" y1="25" x2="50" y2="55" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="50" cy="18" r="6" fill="${gold}"/>
-        <line x1="50" y1="55" x2="60" y2="80" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="55" x2="40" y2="80" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      <g class="arm-fore">
+        <path d="M 50 40 L 60 55" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round"/>
       </g>
     `;
   } else {
-    // DEFAULT / MOBILITY (Gentle sway/stretch)
-    content = `
-      <line x1="15" y1="85" x2="85" y2="85" stroke="${grey}" stroke-width="2" stroke-dasharray="4"/>
-      <g class="r">
-        <line x1="50" y1="30" x2="50" y2="60" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="50" cy="23" r="6" fill="${gold}"/>
-        <line x1="50" y1="35" x2="70" y2="20" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="35" x2="30" y2="50" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="60" x2="60" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="60" x2="40" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
-      </g>
-    `;
+    content = mannequin;
   }
 
-  if (large) {
-    return `<svg viewBox="0 0 100 100" style="width:${w}; height:${h}px; display:block; overflow:hidden;">${css}${content}</svg>`;
-  } else {
-    return `<svg viewBox="0 0 100 100" style="width:44px; height:44px; display:block; overflow:hidden;"><g transform="translate(${offset}, ${offset}) scale(${scale})">${css}${content}</g></svg>`;
-  }
+  return `<svg viewBox="0 0 100 100" class="mannequin ${moveClass}" style="width:${w}; height:${h}px; display:block; overflow:visible;">
+    ${defs}
+    <g transform="translate(${offset}, 0) scale(${scale})" style="transform-origin: 50px 50px;">
+      ${content}
+    </g>
+  </svg>`;
 }
 
 /* -------------------- DAILY QUEST ENGINE -------------------- */
@@ -1429,7 +1486,7 @@ function previewDay(dayId){
     const e=ex(exId);
     const t=getTarget(exId,sl);
     const dur = t.isTime ? t.val+'s' : t.val+(sl.perSide?' / leg':'');
-    html+='<div class="list-item"><div class="avatar" style="padding:0;overflow:hidden">'+getExerciseVisual(e.cat,false)+'</div>'+
+    html+='<div class="list-item"><div class="avatar" style="padding:0;overflow:hidden">'+getExerciseVisual(exId,false)+'</div>'+
       '<div style="flex:1"><div style="font-weight:700;font-size:13.5px">'+e.name+'</div>'+
       '<div class="tiny muted">'+t.sets+' × '+dur+' · rest '+sl.rest+'s</div></div></div>';
   });
