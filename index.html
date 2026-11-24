@@ -101,6 +101,10 @@ button{font-family:inherit}
 .chip.red{background:rgba(255,92,92,.12);color:var(--red);border-color:rgba(255,92,92,.28)}
 .chip.blue{background:rgba(91,140,255,.12);color:var(--blue);border-color:rgba(91,140,255,.3)}
 
+/* EXERCISE VISUALS */
+.ex-thumb{width:44px;height:44px;border-radius:10px;background:#111115;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:0 0 44px;overflow:hidden}
+.ex-anim-box{display:flex;align-items:center;justify-content:center;background:#111115;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px;overflow:hidden}
+
 .ex-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .ex-name{font-size:15.5px;font-weight:800}
 .dots{letter-spacing:2px;font-size:10px;color:var(--gold);margin-top:3px}
@@ -225,11 +229,10 @@ table.hist td:first-child{color:var(--muted)}
 
 <script>
 /* ==========================================================================
-   FORGE — The Athletic Level-Up System (competitive build)
-   Adds: Daily Quest, Muscle Ranks, Voice Coach, Share Card, Ghost Board, Focus Mode
+   FORGE — The Athletic Level-Up System
+   Includes inline animated SVG flashcards for exercises.
    ========================================================================== */
 
-/* -------------------- PWA MANIFEST (inline data URI) -------------------- */
 (function(){
   try{
     const manifest = {
@@ -244,16 +247,14 @@ table.hist td:first-child{color:var(--muted)}
       theme_color: '#08080a',
       icons: [{
         src: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="%2308080a"/><text x="256" y="350" font-family="system-ui,sans-serif" font-size="280" font-weight="900" fill="%23e9b949" text-anchor="middle">F</text></svg>',
-        sizes: '512x512',
-        type: 'image/svg+xml',
-        purpose: 'any'
+        sizes: '512x512', type: 'image/svg+xml', purpose: 'any'
       }]
     };
     const link = document.createElement('link');
     link.rel = 'manifest';
     link.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(manifest));
     document.head.appendChild(link);
-  }catch(e){ /* manifest optional */ }
+  }catch(e){ }
 })();
 
 const EQ_ALL=['none','bands','dumbbells','gym'];
@@ -807,6 +808,96 @@ function checkAchievements(){
   return unlocked;
 }
 
+/* -------------------- VISUALS (FLASHCARDS) -------------------- */
+function getExerciseVisual(cat, large) {
+  const h = large ? 140 : 44;
+  const w = large ? '100%' : '44px';
+  const bg = large ? '#111115' : '#1b1b21';
+  const gold = '#e9b949';
+  const scale = large ? 1 : 0.44;
+  const offset = large ? 0 : 28; // centers the 100x100 box in the small thumbnail
+
+  const css = `
+    <style>
+      .b { animation: bob 1.2s infinite ease-in-out alternate; transform-origin: bottom center; }
+      @keyframes bob { 0% { transform: translateY(0) scaleY(1); } 100% { transform: translateY(${large?'8px':'4px'}) scaleY(0.95); } }
+      .r { animation: rot 1.5s infinite ease-in-out alternate; transform-origin: center; }
+      @keyframes rot { 0% { transform: rotate(0deg); } 100% { transform: rotate(15deg); } }
+    </style>
+  `;
+
+  let content = '';
+  if (cat === 'push') {
+    content = `
+      <line x1="10" y1="75" x2="90" y2="75" stroke="#333" stroke-width="2" stroke-dasharray="4"/>
+      <g class="b">
+        <line x1="25" y1="45" x2="65" y2="55" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="75" cy="60" r="5" fill="${gold}"/>
+        <line x1="65" y1="55" x2="65" y2="75" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <line x1="25" y1="45" x2="15" y2="75" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      </g>
+    `;
+  } else if (cat === 'legs') {
+    content = `
+      <line x1="10" y1="85" x2="90" y2="85" stroke="#333" stroke-width="2" stroke-dasharray="4"/>
+      <g class="b">
+        <line x1="50" y1="25" x2="50" y2="55" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="50" cy="18" r="5" fill="${gold}"/>
+        <line x1="50" y1="55" x2="60" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="55" x2="40" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      </g>
+    `;
+  } else if (cat === 'pull') {
+    content = `
+      <line x1="20" y1="15" x2="80" y2="15" stroke="#555" stroke-width="4" stroke-linecap="round"/>
+      <g class="b">
+        <line x1="50" y1="30" x2="50" y2="75" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="50" cy="23" r="5" fill="${gold}"/>
+        <line x1="50" y1="30" x2="40" y2="15" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="30" x2="60" y2="15" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      </g>
+    `;
+  } else if (cat === 'core') {
+    content = `
+      <line x1="10" y1="70" x2="90" y2="70" stroke="#333" stroke-width="2" stroke-dasharray="4"/>
+      <line x1="20" y1="45" x2="70" y2="55" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="80" cy="60" r="5" fill="${gold}"/>
+      <line x1="70" y1="55" x2="80" y2="70" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      <line x1="20" y1="45" x2="10" y2="70" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+    `;
+  } else if (cat === 'conditioning') {
+    content = `
+      <line x1="10" y1="85" x2="90" y2="85" stroke="#333" stroke-width="2" stroke-dasharray="4"/>
+      <line x1="50" y1="25" x2="50" y2="55" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="50" cy="18" r="5" fill="${gold}"/>
+      <g class="r">
+        <line x1="50" y1="55" x2="65" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="55" x2="35" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="35" x2="65" y2="15" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="35" x2="35" y2="15" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      </g>
+    `;
+  } else {
+    content = `
+      <line x1="10" y1="85" x2="90" y2="85" stroke="#333" stroke-width="2" stroke-dasharray="4"/>
+      <g class="r">
+        <line x1="50" y1="30" x2="50" y2="60" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="50" cy="23" r="5" fill="${gold}"/>
+        <line x1="50" y1="35" x2="70" y2="20" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="35" x2="30" y2="20" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="60" x2="60" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="60" x2="40" y2="85" stroke="${gold}" stroke-width="4" stroke-linecap="round"/>
+      </g>
+    `;
+  }
+
+  if (large) {
+    return `<svg viewBox="0 0 100 100" style="width:${w}; height:${h}px; display:block; overflow:hidden;">${css}${content}</svg>`;
+  } else {
+    return `<svg viewBox="0 0 100 100" style="width:44px; height:44px; display:block; overflow:hidden;"><g transform="translate(${offset}, ${offset}) scale(${scale})">${css}${content}</g></svg>`;
+  }
+}
+
 /* -------------------- DAILY QUEST ENGINE -------------------- */
 function todayQuestId(){
   const seed = todayStr().split('-').reduce((a,b)=>a+Number(b),0);
@@ -928,18 +1019,14 @@ function generateShareCard(){
   const c=document.createElement('canvas');
   c.width=1080; c.height=1350;
   const ctx=c.getContext('2d');
-  // bg
   ctx.fillStyle='#08080a'; ctx.fillRect(0,0,c.width,c.height);
-  // gold glow
   const grad=ctx.createRadialGradient(900,100,0,900,100,600);
   grad.addColorStop(0,'rgba(233,185,73,0.25)'); grad.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=grad; ctx.fillRect(0,0,c.width,c.height);
-  // brand
   ctx.fillStyle='#e9b949'; ctx.font='900 72px system-ui,sans-serif'; ctx.textAlign='center';
   ctx.fillText('FORGE',540,140);
   ctx.fillStyle='#8a8a99'; ctx.font='700 24px system-ui,sans-serif';
   ctx.fillText('THE ATHLETIC LEVEL-UP SYSTEM',540,190);
-  // level ring
   ctx.beginPath(); ctx.arc(540,380,120,0,Math.PI*2); ctx.strokeStyle='#26262e'; ctx.lineWidth=16; ctx.stroke();
   ctx.beginPath(); ctx.arc(540,380,120,-Math.PI/2,-Math.PI/2+(Math.PI*2)*(L.pct/100)); ctx.strokeStyle='#e9b949'; ctx.lineWidth=16; ctx.stroke();
   ctx.fillStyle='#e9b949'; ctx.font='900 96px system-ui,sans-serif'; ctx.textAlign='center';
@@ -948,7 +1035,6 @@ function generateShareCard(){
   ctx.fillText('LEVEL',540,450);
   ctx.fillStyle='#f4f4f7'; ctx.font='800 36px system-ui,sans-serif';
   ctx.fillText(L.title,540,530);
-  // stats
   ctx.font='700 26px system-ui,sans-serif'; ctx.textAlign='left';
   const stats=[
     ['TOTAL XP', S.xp.toLocaleString()],
@@ -963,7 +1049,6 @@ function generateShareCard(){
     ctx.fillStyle='#e9b949'; ctx.font='900 44px system-ui,sans-serif';
     ctx.fillText(s[1],x,y+48);
   });
-  // ranks
   ctx.fillStyle='#8a8a99'; ctx.font='700 22px system-ui,sans-serif'; ctx.textAlign='center';
   ctx.fillText('MUSCLE RANKS',540,970);
   const rk=Object.keys(ranks);
@@ -975,7 +1060,6 @@ function generateShareCard(){
     ctx.font='900 40px system-ui,sans-serif';
     ctx.fillText(ranks[k].rank,x,1065);
   });
-  // footer
   ctx.fillStyle='#26262e'; ctx.fillRect(0,1280,c.width,2);
   ctx.fillStyle='#8a8a99'; ctx.font='700 18px system-ui,sans-serif'; ctx.textAlign='center';
   ctx.fillText(fmtDateLong(todayStr())+' · FORGE',540,1325);
@@ -1109,7 +1193,6 @@ function viewHome(){
     '</div>'+
   '</div>';
 
-  // Daily Quest card
   if(q){
     const pct=Math.min(100,(qp.current/qp.target)*100);
     const done=S.dailyQuests.completed.indexOf(q.id)>=0;
@@ -1154,7 +1237,6 @@ function viewHome(){
       '</div><span class="muted">›</span></div></div>';
   }
 
-  // Ghost leaderboard
   html+='<div class="card tight">'+
     '<div class="between"><span class="chip">Ghost Board</span>'+
     '<span class="tiny muted">vs your best</span></div>'+
@@ -1166,7 +1248,6 @@ function viewHome(){
       (ghost.thisWeek>=ghost.best?'New personal week — you are the benchmark':'Beating your ghost by '+Math.abs(ghost.delta)+' session(s)')+
     '</div></div>';
 
-  // Muscle ranks
   html+='<div class="sec-title">Muscle Ranks</div>';
   html+='<div class="card tight"><div class="grid3">';
   Object.keys(ranks).forEach(k=>{
@@ -1284,7 +1365,7 @@ function previewDay(dayId){
     const e=ex(exId);
     const t=getTarget(exId,sl);
     const dur = t.isTime ? t.val+'s' : t.val+(sl.perSide?' / leg':'');
-    html+='<div class="list-item"><div class="avatar">'+catIcon(e.cat)+'</div>'+
+    html+='<div class="list-item"><div class="avatar" style="padding:0;overflow:hidden">'+getExerciseVisual(e.cat,false)+'</div>'+
       '<div style="flex:1"><div style="font-weight:700;font-size:13.5px">'+e.name+'</div>'+
       '<div class="tiny muted">'+t.sets+' × '+dur+' · rest '+sl.rest+'s</div></div></div>';
   });
@@ -1336,12 +1417,20 @@ function viewSession(){
     const e=ex(it.exId);
     const advice=progressionAdvice(it.exId);
     html+='<div class="card'+(focusMode?' focus-active':'')+'">';
-    html+='<div class="ex-head"><div style="flex:1">'+
-      '<div class="ex-name">'+e.name+(it.perSide?' <span class="tiny muted">(per leg)</span>':'')+'</div>'+
-      '<div class="dots">'+dots(e.diff)+'</div>'+
-      '<div class="tiny muted" style="margin-top:4px">'+e.muscles.join(' · ')+' · rest '+it.rest+'s</div>'+
+    
+    // Header with Visual Thumbnail
+    html+='<div class="ex-head">'+
+      '<div style="flex:1; display:flex; gap:12px; align-items:flex-start;">'+
+        '<div class="ex-thumb" style="width:54px;height:54px;flex:0 0 54px;">'+getExerciseVisual(e.cat,false)+'</div>'+
+        '<div style="flex:1">'+
+          '<div class="ex-name">'+e.name+(it.perSide?' <span class="tiny muted">(per leg)</span>':'')+'</div>'+
+          '<div class="dots">'+dots(e.diff)+'</div>'+
+          '<div class="tiny muted" style="margin-top:4px">'+e.muscles.join(' · ')+' · rest '+it.rest+'s</div>'+
+          '<button class="btn btn-ghost btn-sm" style="padding:4px 8px; margin-top:6px; font-size:11px;" onclick="showExercise(\''+it.exId+'\')">View Demo</button>'+
+        '</div>'+
       '</div>'+
-      '<button class="icon-btn" onclick="showExercise(\''+it.exId+'\')">i</button></div>';
+      '<button class="icon-btn" onclick="showExercise(\''+it.exId+'\')">i</button>'+
+    '</div>';
 
     if(advice){
       html+='<div class="gold-box" style="margin-top:10px;font-size:12px">⚙ <b>Progression:</b> '+esc(advice)+'</div>';
@@ -1423,7 +1512,7 @@ function replaceExercise(key){
   pool.forEach(id=>{
     const e=EXERCISES[id];
     html+='<div class="list-item" style="cursor:pointer" onclick="doReplace(\''+key+'\',\''+id+'\')">'+
-      '<div class="avatar">'+catIcon(e.cat)+'</div><div style="flex:1">'+
+      '<div class="avatar" style="padding:0;overflow:hidden">'+getExerciseVisual(e.cat,false)+'</div><div style="flex:1">'+
       '<div style="font-weight:700;font-size:13.5px">'+e.name+'</div>'+
       '<div class="dots">'+dots(e.diff)+'</div></div><span class="muted">›</span></div>';
   });
@@ -1553,7 +1642,8 @@ function updateRestBar(){
 function showExercise(id){
   const e=ex(id);
   const eqList=e.equip.map(equipLabel).join(', ');
-  let html='<h3 style="margin-bottom:2px">'+e.name+'</h3>'+
+  let html='<div class="ex-anim-box">'+getExerciseVisual(e.cat,true)+'</div>'+
+    '<h3 style="margin-bottom:2px">'+e.name+'</h3>'+
     '<div class="row" style="gap:8px;margin:8px 0 14px;flex-wrap:wrap">'+
       '<span class="chip gold">'+e.cat+'</span>'+
       '<span class="chip">'+['','Beginner','Easy','Moderate','Hard','Expert'][e.diff]+'</span>'+
@@ -1599,7 +1689,7 @@ function libList(){
     const e=EXERCISES[id];
     const av=availableEx(id);
     html+='<div class="list-item" style="cursor:pointer;'+(av?'':'opacity:.45')+'" onclick="showExercise(\''+id+'\')">'+
-      '<div class="avatar">'+catIcon(e.cat)+'</div>'+
+      '<div class="avatar" style="padding:0;overflow:hidden">'+getExerciseVisual(e.cat,false)+'</div>'+
       '<div style="flex:1"><div style="font-weight:700;font-size:13.5px">'+e.name+'</div>'+
       '<div class="dots">'+dots(e.diff)+'</div></div>'+
       (av?'<span class="chip green">Ready</span>':'<span class="chip">Needs gear</span>')+
