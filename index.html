@@ -1101,7 +1101,7 @@ function muscleXPForWorkout(w){
   (w.entries||[]).forEach(e=>{
     if(e.skipped) return;
     const cat=ex(e.exId).cat;
-    if(!xp[cat]) return;
+    if(xp[cat] === undefined) return;
     const done=e.sets.filter(s=>s.done).length;
     xp[cat]+=done*3;
   });
