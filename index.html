@@ -227,35 +227,35 @@ table.hist td:first-child{color:var(--muted)}
 .mannequin .bar { fill: #555; stroke: none; filter: none; }
 
 /* Push-Up Motion */
-.anim-push .body { animation: pushBody 1.8s infinite ease-in-out alternate; transform-origin: 75px 80px; }
-.anim-push .arm-upper { animation: pushArmU 1.8s infinite ease-in-out alternate; transform-origin: 70px 55px; }
-.anim-push .arm-lower { animation: pushArmL 1.8s infinite ease-in-out alternate; transform-origin: 75px 70px; }
+.anim-push .body { animation: pushBody 1.8s infinite ease-in-out alternate; transform-origin: 20px 90px; }
+.anim-push .arm-u { animation: pushArmU 1.8s infinite ease-in-out alternate; transform-box: fill-box; transform-origin: 0% 0%; }
+.anim-push .arm-l { animation: pushArmL 1.8s infinite ease-in-out alternate; transform-box: fill-box; transform-origin: 0% 0%; }
 @keyframes pushBody { 0%, 20% { transform: translateY(0); } 80%, 100% { transform: translateY(14px); } }
 @keyframes pushArmU { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(25deg); } }
-@keyframes pushArmL { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-35deg); } }
+@keyframes pushArmL { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-45deg); } }
 
 /* Squat Motion */
-.anim-squat .body { animation: squatBody 1.8s infinite ease-in-out alternate; transform-origin: 50px 65px; }
-.anim-squat .leg-upper { animation: squatLegU 1.8s infinite ease-in-out alternate; transform-origin: 50px 65px; }
-.anim-squat .leg-lower { animation: squatLegL 1.8s infinite ease-in-out alternate; transform-origin: 60px 80px; }
+.anim-squat .body { animation: squatBody 1.8s infinite ease-in-out alternate; transform-origin: 50px 60px; }
+.anim-squat .leg-u { animation: squatLegU 1.8s infinite ease-in-out alternate; transform-box: fill-box; transform-origin: 0% 0%; }
+.anim-squat .leg-l { animation: squatLegL 1.8s infinite ease-in-out alternate; transform-box: fill-box; transform-origin: 0% 0%; }
 @keyframes squatBody { 0%, 20% { transform: translateY(0) rotate(0deg); } 80%, 100% { transform: translateY(18px) rotate(15deg); } }
 @keyframes squatLegU { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(30deg); } }
 @keyframes squatLegL { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-45deg); } }
 
 /* Pull-Up Motion */
-.anim-pullup .body { animation: pullBody 1.8s infinite ease-in-out alternate; transform-origin: 50px 30px; }
-.anim-pullup .arm-upper { animation: pullArm 1.8s infinite ease-in-out alternate; transform-origin: 50px 30px; }
+.anim-pullup .body { animation: pullBody 1.8s infinite ease-in-out alternate; transform-origin: 50px 20px; }
+.anim-pullup .arm { animation: pullArm 1.8s infinite ease-in-out alternate; transform-box: fill-box; transform-origin: 0% 0%; }
 @keyframes pullBody { 0%, 20% { transform: translateY(0); } 80%, 100% { transform: translateY(-20px); } }
 @keyframes pullArm { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(15deg); } }
 
 /* Row Motion */
 .anim-row .body { animation: rowBody 1.8s infinite ease-in-out alternate; transform-origin: 30px 60px; }
-.anim-row .arm-upper { animation: rowArm 1.8s infinite ease-in-out alternate; transform-origin: 70px 50px; }
+.anim-row .arm { animation: rowArm 1.8s infinite ease-in-out alternate; transform-box: fill-box; transform-origin: 0% 0%; }
 @keyframes rowBody { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-15deg); } }
 @keyframes rowArm { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-40deg); } }
 
 /* Bridge Motion */
-.anim-bridge .body { animation: bridgeBody 1.8s infinite ease-in-out alternate; transform-origin: 30px 80px; }
+.anim-bridge .body { animation: bridgeBody 1.8s infinite ease-in-out alternate; transform-origin: 25px 85px; }
 @keyframes bridgeBody { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-20deg); } }
 
 /* Lunge Motion */
@@ -263,6 +263,13 @@ table.hist td:first-child{color:var(--muted)}
 .anim-lunge .leg-back { animation: lungeLeg 1.8s infinite ease-in-out alternate; transform-origin: 45px 55px; }
 @keyframes lungeBody { 0%, 20% { transform: translateY(0); } 80%, 100% { transform: translateY(15px); } }
 @keyframes lungeLeg { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-20deg); } }
+
+/* Plank Motion */
+.anim-plank .body { animation: breathe 3s infinite ease-in-out; }
+
+/* Burpee Motion */
+.anim-burpee .body { animation: burpee 1.5s infinite ease-in-out; transform-origin: 50px 95px; }
+@keyframes burpee { 0%, 20% { transform: translateY(0); } 40% { transform: translateY(-30px); } 60% { transform: translateY(0); } 80%, 100% { transform: translateY(10px) scaleY(0.8); } }
 
 /* Static / Plank */
 .anim-static .body { animation: breathe 3s infinite ease-in-out; }
@@ -822,11 +829,12 @@ function updateProgression(entries){
         }
         p.success=0;
       } else if(isTime){
-        p.time=(p.time||30)+5; note='Add 5 seconds — two solid sessions in a row.';
+        p.time = Math.min((p.time||30)+5, 300); // FIX: cap at 300s
+        note='Add 5 seconds — two solid sessions in a row.';
         p.success=0;
       } else {
         const inc=p.reps<12?2:1;
-        p.reps=(p.reps||8)+inc;
+        p.reps = Math.min((p.reps||8)+inc, 50); // FIX: cap at 50 reps
         note='Add '+inc+' rep(s) — consistent completion at a comfortable effort.';
         p.success=0;
       }
@@ -877,6 +885,7 @@ function getExerciseVisual(exId, large) {
   else if (['inverted-row','db-row','cable-row','band-row','towel-iso-row','doorway-row'].includes(exId)) moveClass = 'anim-row';
   else if (['glute-bridge','single-leg-glute-bridge','band-glute-bridge','bb-hip-thrust'].includes(exId)) moveClass = 'anim-bridge';
   else if (['burpee','squat-jump','jumping-jack','high-knees','mountain-climber','bear-crawl'].includes(exId)) moveClass = 'anim-burpee';
+  else if (['plank','side-plank','hollow-hold','rkc-plank','dead-bug'].includes(exId)) moveClass = 'anim-plank'; // FIX: Correct pose for plank
   
   // 3D shading gradients
   const defs = `
@@ -1007,6 +1016,35 @@ function getExerciseVisual(exId, large) {
         <path d="M 50 40 L 60 55" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round"/>
       </g>
     `;
+  } else if (moveClass === 'anim-plank') {
+    content = `
+      <line x1="10" y1="80" x2="90" y2="80" class="bg"/>
+      <g class="body">
+        <circle cx="85" cy="70" r="7" />
+        <rect x="25" y="65" width="55" height="14" rx="7" />
+        <path d="M 25 75 L 20 80" fill="none" stroke="#b07d1a" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 70 75 L 75 80" fill="none" stroke="#b07d1a" stroke-width="8" stroke-linecap="round"/>
+      </g>
+      <g class="arm-fore">
+        <path d="M 80 70 L 80 80" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round"/>
+      </g>
+    `;
+  } else if (moveClass === 'anim-burpee') {
+    content = `
+      <line x1="10" y1="95" x2="90" y2="95" class="bg"/>
+      <g class="body">
+        <circle cx="50" cy="25" r="7" />
+        <rect x="43" y="35" width="14" height="30" rx="7" />
+        <path d="M 45 45 L 30 65" fill="none" stroke="#b07d1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" style="filter:none"/>
+        <path d="M 50 65 L 40 95" fill="none" stroke="#b07d1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" style="filter:none"/>
+      </g>
+      <g class="arm-fore">
+        <path d="M 55 45 L 70 65" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <g class="leg-fore">
+        <path d="M 55 65 L 65 95" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+    `;
   } else {
     content = mannequin;
   }
@@ -1101,7 +1139,7 @@ function muscleXPForWorkout(w){
   (w.entries||[]).forEach(e=>{
     if(e.skipped) return;
     const cat=ex(e.exId).cat;
-    if(xp[cat] === undefined) return;
+    if(xp[cat] === undefined) return; // FIXED: Now correctly adds XP even if initialized to 0
     const done=e.sets.filter(s=>s.done).length;
     xp[cat]+=done*3;
   });
@@ -1110,6 +1148,13 @@ function muscleXPForWorkout(w){
 function addMuscleXP(w){
   const xp=muscleXPForWorkout(w);
   Object.keys(xp).forEach(k=>{ S.muscleXP[k]=(S.muscleXP[k]||0)+xp[k]; });
+}
+function recomputeMuscleXP(){
+  S.muscleXP = { push:0, pull:0, legs:0, core:0, conditioning:0 };
+  S.workouts.forEach(w => {
+    const xp = muscleXPForWorkout(w);
+    Object.keys(xp).forEach(k => { S.muscleXP[k] += xp[k]; });
+  });
 }
 function rankIndexForXP(xp){
   for(let i=RANK_THRESHOLDS.length-1;i>=0;i--){ if(xp>=RANK_THRESHOLDS[i]) return i; }
@@ -2139,7 +2184,7 @@ function viewPhotos(){
 function handlePhoto(ev,view){
   const file=ev.target.files && ev.target.files[0];
   if(!file) return;
-  resizeImage(file,800,0.7).then(data=>{
+  resizeImage(file,500,0.5).then(data=>{ // FIX: Reduced to 500px/50% to save local storage
     pruneOldPhotos(true);
     const photo={id:uid(), date:todayStr(), ts:Date.now(), view, data, notes:''};
     S.photos.push(photo);
@@ -2257,6 +2302,7 @@ function delWorkout(id){
   S.workouts=S.workouts.filter(x=>x.id!==id);
   S.xp=Math.max(0,S.xp-w.xp);
   recomputePRs();
+  recomputeMuscleXP(); // FIX: Reverts muscle XP correctly
   saveState(); render();
   toast('Workout deleted');
 }
